@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ProUser.API.Services;
 using ProUser.Contracts;
 using ProUser.Models;
 using ProUser.Services;
@@ -14,6 +16,7 @@ namespace ProUser.Controllers
         private readonly UserService _userService;
         private readonly ISecurityService _securityService;
         private readonly IAddressService _addressService;
+        private readonly WhatsappService _whatsappService = new WhatsappService();
 
 
         public ProUserController(UserService userService,
@@ -31,13 +34,14 @@ namespace ProUser.Controllers
         {
             try
             { 
+                if(_userService.IsEmailUsed(model.Email)) return BadRequest("O email já está sendo usado.");
+
                 string userNumero = model.Address.Numero;
                 string userComplemento = model.Address.Complemento;
 
                 var user = model;
-
+                
                 user.Address = await _addressService.GetAddressByCEPAsync(model.Address.Cep);
-
                 user.Address.Numero = userNumero;
                 user.Address.Complemento = userComplemento;
                 
@@ -53,21 +57,15 @@ namespace ProUser.Controllers
             }
         }
 
-        [HttpPut("{username}")]
-        public ActionResult Update(string username, User user){
-            try
-            {
-                var verify = _userService.GetUser(username);
-                if(verify==null) BadRequest("User não encontrado.");
+        
 
-                _userService.Update(username, user);
-                return Ok();
-            }
-            catch (System.Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, " Erro no Update: "+ex.Message);
-            }
-
+        [HttpGet]
+        [Route("whatsapp")]
+        [Authorize]
+        public ActionResult Whatsapp()
+        {
+            _whatsappService.Open();
+            return Ok();
         }
     }
 }

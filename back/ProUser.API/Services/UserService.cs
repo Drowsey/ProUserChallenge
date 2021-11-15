@@ -42,7 +42,13 @@ namespace ProUser.Services
             _users.DeleteOne(x => x.Username.ToLower() == username.ToLower());
         }
 
-        public string GetHashPassword(string username){
+        public bool IsEmailUsed(string email){
+            var user = _users.Find(x => x.Email.ToLower() == email.ToLower()).FirstOrDefault();
+
+            return (user == null);
+        }
+
+        public string GetPassword(string username){
 
             var user =  _users.Find(x=>x.Username.ToLower() == username.ToLower()).FirstOrDefault();
 

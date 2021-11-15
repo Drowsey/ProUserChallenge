@@ -10,6 +10,7 @@ namespace ProUser.Services
         {
             _userService = userService;
         }
+
         public string HashPassword(string password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
@@ -17,7 +18,7 @@ namespace ProUser.Services
 
         public bool VerifyPassword(Login login)
         {
-            return BCrypt.Net.BCrypt.Verify(login.Password, _userService.GetHashPassword(login.Username));
+            return BCrypt.Net.BCrypt.Verify(login.Password, _userService.GetPassword(login.Username));
         }
     }
 }
