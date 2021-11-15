@@ -63,6 +63,6 @@ $ npm install -g @angular/cli
 Execute o app
 
 ```bash
-$ ng st
+$ ng start
 ```
 
